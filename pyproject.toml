@@ -1,0 +1,47 @@
+[project]
+name = "stackoverflow-to-sqlite"
+version = "0.1.0"
+
+authors = [{ name = "David Brownman", email = "beamneocube@gmail.com" }]
+description = "Quickly and painlessly dump all your Airtable schemas & data to JSON."
+readme = "README.md"
+license = { file = "LICENSE" }
+
+requires-python = ">=3.12" # generic syntax on some types
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT Software License",
+  "Operating System :: OS Independent",
+  "Topic :: System :: Archiving :: Backup",
+]
+keywords = ["stackoverflow", "backup", "exporter", "sqlite"]
+
+dependencies = ["click==8.1.3", "httpx==0.27.0"]
+
+[project.optional-dependencies]
+test = ["pytest==8.2.1", "pytest-httpx==0.30.0", "pytest-freezer==0.4.8"]
+release = ["twine==4.0.2", "build==0.10.0"]
+ci = ["pyright==1.1.359", "ruff==0.4.1"]
+
+[project.urls]
+"Homepage" = "https://github.com/xavdid/stackoverflow-to-sqlite"
+"Bug Tracker" = "https://github.com/xavdid/stackoverflow-to-sqlite/issues"
+"Author" = "https://xavd.id"
+"Changelog" = "https://github.com/xavdid/stackoverflow-to-sqlite/blob/main/CHANGELOG.md"
+
+[project.scripts]
+stackoverflow-to-sqlite = "stackoverflow_to_sqlite.cli:cli"
+
+[build-system]
+requires = ["flit_core>=3.4"]
+build-backend = "flit_core.buildapi"
+
+# needed so the LSP performs typechecking
+[tool.pyright]
+
+[tool.ruff.lint]
+select = ["E", "F", "I001"] # defaults & isort
+ignore = ["E501"]
+unfixable = ["F401"]
