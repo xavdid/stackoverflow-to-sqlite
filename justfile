@@ -4,6 +4,11 @@ _default:
 # error out if this isn't being run in a venv
 _require-venv:
     #!/usr/bin/env python
+    import os
+    # skip check in CI
+    if os.environ.get('CI'):
+        sys.exit(0)
+
     import sys
     sys.exit(sys.prefix == sys.base_prefix)
 

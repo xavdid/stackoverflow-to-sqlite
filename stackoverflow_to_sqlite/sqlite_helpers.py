@@ -6,7 +6,7 @@ from stackoverflow_to_sqlite.types import QuestionResponse, QuestionRow
 def question_to_row(question: QuestionResponse) -> QuestionRow:
     return {
         **question,
-        "tags": str(question["tags"]).strip("[]"),
+        "tags": None,  # str(question["tags"]).strip("[]"),
         "comments": None,
         "accepted_answer_id": None,
         "owner": None,
@@ -15,10 +15,6 @@ def question_to_row(question: QuestionResponse) -> QuestionRow:
         "asker": question["owner"]["account_id"],
         "site": question["link"].strip("https://"),
     }
-
-
-# def insert_tags(db: Database, tags: list[str]):
-#     db["tags"].upsert_all([{"id": t} for t in tags], pk="id")
 
 
 def remove_none(d: dict) -> dict:
@@ -42,12 +38,14 @@ def upsert_questions(db: Database, questions: list[QuestionResponse]):
             pk="question_id",
             alter=True,
             foreign_keys=[("owner", "users", "account_id")],
-            column_order=["question_id", "link", "title", "tags", "body_markdown"],
+            column_order=[
+                "question_id",
+                "link",
+                "title",
+                "tags",
+                "body_markdown",
+                "score",
+            ],
         ).m2m("tags", [{"name": t} for t in q["tags"]], pk="name")
 
     db["questions"].enable_fts(["title", "body_markdown"])
-    # db["questions"].upsert_all(
-    #     map(question_to_row, questions),
-    #     pk="question_id",
-    #     foreign_keys=[("tags", "tags", "id")],
-    # )

@@ -1,4 +1,4 @@
-from typing import Any, NotRequired, Optional, TypedDict, cast
+from typing import Any, NotRequired, TypedDict
 
 
 class ResponseWrapper[T](TypedDict):
@@ -46,12 +46,11 @@ class QuestionResponse(TypedDict):
 class QuestionRow(QuestionResponse):
     # these get dumped out as a stringified list, which isn't great
     # but neither is support for m2m relationships: https://github.com/simonw/datasette/issues/484
-    tags: str
+    tags: None
     comments: None
     comment_count: int
-    owner: int  # account_id, not user id
     has_accepted_answer: bool
     accepted_answer_id: None
     owner: None
     site: str
-    asker: int
+    asker: int  # account_id

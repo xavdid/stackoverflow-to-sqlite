@@ -1,12 +1,4 @@
-import json
-import time
-from datetime import date
-from pathlib import Path
-from typing import Any, Callable, Iterable, TypedDict
-from urllib.parse import urlencode
-
 import click
-import httpx
 from sqlite_utils import Database
 
 from stackoverflow_to_sqlite.sqlite_helpers import upsert_questions
