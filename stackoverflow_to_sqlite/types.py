@@ -51,6 +51,8 @@ class QuestionRow(QuestionResponse):
     comment_count: int
     has_accepted_answer: bool
     accepted_answer_id: None
+    is_considered_answered: bool
+    is_answered: None
     owner: None
     site: str
     asker: int  # account_id

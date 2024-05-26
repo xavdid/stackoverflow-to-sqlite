@@ -44,3 +44,8 @@ ci: && validate
     python -m build
     # give upload api key at runtime
     python -m twine upload --username __token__ dist/*
+
+@iterate: _require-venv
+    rm -f stack-exchange.db
+    stackoverflow-to-sqlite user 1825390
+    datasette serve stack-exchange.db
