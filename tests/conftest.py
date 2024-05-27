@@ -169,3 +169,64 @@ def answers_response(httpx_mock):
     }
 
     httpx_mock.add_response(**mock_details)
+
+
+@pytest.fixture
+def comments_response(httpx_mock):
+    params = {
+        "pagesize": 100,
+        "site": "stackoverflow.com",
+        "filter": RESPONSE_FILTER,
+        "order": "desc",
+        "sort": "creation",
+        "page": 1,
+    }
+
+    mock_details = {
+        "url": f"https://api.stackexchange.com/2.3/users/123/comments?{urlencode(params)}",
+        "json": {
+            "has_more": False,
+            "page": 1,
+            "page_size": 100,
+            "total": 15,
+            "type": "questions",
+            "items": [
+                {
+                    "owner": {
+                        "account_id": 2045145,
+                        "reputation": 5204,
+                        "user_id": 1825390,
+                        "user_type": "registered",
+                        "display_name": "xavdid",
+                        "link": "https://stackoverflow.com/users/1825390/xavdid",
+                    },
+                    "score": 0,
+                    "post_type": "answer",
+                    "post_id": 77359032,
+                    "comment_id": 136383710,
+                    "body_markdown": "Awesome, thank you for the explanation!",
+                    "link": "https://stackoverflow.com/questions/77357478/is-it-possible-to-define-case-clauses-with-an-elixir-macro/77359032#comment136383710_77359032",
+                    "body": "Awesome, thank you for the explanation!",
+                },
+                {
+                    "owner": {
+                        "account_id": 2045145,
+                        "reputation": 5204,
+                        "user_id": 1825390,
+                        "user_type": "registered",
+                        "display_name": "xavdid",
+                        "link": "https://stackoverflow.com/users/1825390/xavdid",
+                    },
+                    "score": 0,
+                    "post_type": "answer",
+                    "post_id": 53985308,
+                    "comment_id": 132839139,
+                    "body_markdown": "While true, I can&#39;t think of a",
+                    "link": "https://stackoverflow.com/questions/3854310/how-to-convert-a-negative-number-to-positive/53985308#comment132839139_53985308",
+                    "body": "While true, I can&#39;t think of a",
+                },
+            ],
+        },
+    }
+
+    httpx_mock.add_response(**mock_details)

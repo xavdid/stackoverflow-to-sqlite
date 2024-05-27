@@ -1,5 +1,4 @@
 from click.testing import CliRunner
-from sqlite_utils import Database
 
 from stackoverflow_to_sqlite.cli import cli
 
@@ -13,7 +12,11 @@ def test_version():
 
 
 def test_full_backup(
-    questions_response, answers_response, tmp_db_path, tmp_db: Database
+    questions_response,
+    answers_response,
+    comments_response,
+    tmp_db_path,
+    tmp_db,
 ):
     result = CliRunner().invoke(cli, ["user", "123", "--db", tmp_db_path])
     assert result.exit_code == 0
@@ -31,6 +34,7 @@ def test_full_backup(
     assert list(tmp_db["users"].rows) == [
         {
             "account_id": 2045145,
+            "stack_overflow_id": 1825390,
             "name": "xavdid",
             "network_profile_url": "https://stackexchange.com/users/2045145/",
         }
@@ -113,11 +117,32 @@ def test_full_backup(
         },
     ]
 
+    assert list(tmp_db["comments"].rows) == [
+        {
+            "body_markdown": "While true, I can&#39;t think of a",
+            "comment_id": 132839139,
+            "link": "https://stackoverflow.com/questions/3854310/how-to-convert-a-negative-number-to-positive/53985308#comment132839139_53985308",
+            "post_id": 53985308,
+            "post_type": "answer",
+            "score": 0,
+            "site": "stackoverflow.com",
+            "user": 2045145,
+        },
+        {
+            "body_markdown": "Awesome, thank you for the explanation!",
+            "comment_id": 136383710,
+            "link": "https://stackoverflow.com/questions/77357478/is-it-possible-to-define-case-clauses-with-an-elixir-macro/77359032#comment136383710_77359032",
+            "post_id": 77359032,
+            "post_type": "answer",
+            "score": 0,
+            "site": "stackoverflow.com",
+            "user": 2045145,
+        },
+    ]
+
     # validate that the FK was set up correctly
-    assert (
-        "[user] INTEGER REFERENCES [users]([account_id])" in tmp_db["questions"].schema
-    )
-    assert "[user] INTEGER REFERENCES [users]([account_id])" in tmp_db["answers"].schema
+    for table in ["questions", "answers", "comments"]:
+        assert "[user] INTEGER REFERENCES [users]([account_id])" in tmp_db[table].schema
 
     assert list(tmp_db["tags"].rows) == [
         {

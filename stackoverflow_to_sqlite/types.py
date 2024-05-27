@@ -1,4 +1,4 @@
-from typing import Any, NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 
 class ResponseWrapper[T](TypedDict):
@@ -19,6 +19,13 @@ class User(TypedDict):
     user_type: str
     display_name: str
     link: str
+
+
+class UserRow(TypedDict):
+    account_id: int
+    name: str
+    stack_overflow_id: int | None
+    network_profile_url: str
 
 
 class QuestionResponse(TypedDict):
@@ -52,8 +59,8 @@ class QuestionRow(QuestionResponse):
     is_considered_answered: bool
     is_answered: None
     owner: None
-    site: str
     user: int  # account_id
+    site: str
 
 
 class AnswerResponse(TypedDict):
@@ -77,8 +84,26 @@ class AnswerResponse(TypedDict):
 
 class AnswerRow(AnswerResponse):
     owner: None
-    site: str
     user: int  # account_id
+    site: str
     title: None
     question_title: str
     tags: None
+
+
+class CommentResopnse(TypedDict):
+    score: int
+    post_type: str
+    body_markdown: str
+    post_id: int
+    comment_id: int
+    link: str
+    owner: User
+    body: str
+
+
+class CommentRow(CommentResopnse):
+    owner: None
+    user: int  # account_id
+    body: None
+    site: str

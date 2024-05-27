@@ -5,12 +5,19 @@ import httpx
 
 from stackoverflow_to_sqlite.types import (
     AnswerResponse,
+    CommentResopnse,
     QuestionResponse,
     ResponseWrapper,
 )
 
 # this works for responses of all types
-RESPONSE_FILTER = "!S)wxxkXA5fyMMShzhUnJpTEaqB4NZq8VWklMWjBAqPt.BT6LDY0bt5*yNvTlYS7E"
+# NOTE: includes comment.body in addition to comment.body_markdown because the latter doesn't reliably show up if the former is missing??
+RESPONSE_FILTER = (
+    "!FHoa8)KWO*ZQJclfFQ-ArYmMMP7me1YZuhJpcQSM(ORmcE)-)3oYySMQ.8K2CnuTRz0h0MPb"
+)
+
+# used for live tests to reduce API calls
+SKIP_LOOP = False
 
 
 def _api_call(
@@ -41,11 +48,14 @@ def _fetch_paged_resource(
         print(".", end="", flush=True)
 
         # TODO: handle error and save what we got
+        # TODO: control to not loop for tests
 
         result += response["items"]
-        if not response["has_more"]:
+
+        if SKIP_LOOP or not response["has_more"]:
             break
 
+    print(flush=True)
     return result
 
 
@@ -55,3 +65,7 @@ def fetch_questions(user_id: str, site: str) -> list[QuestionResponse]:
 
 def fetch_answers(user_id: str, site: str) -> list[AnswerResponse]:
     return _fetch_paged_resource("answers", user_id, site)
+
+
+def fetch_comments(user_id: str, site: str) -> list[CommentResopnse]:
+    return _fetch_paged_resource("comments", user_id, site)

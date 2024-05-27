@@ -4,9 +4,14 @@ from sqlite_utils import Database
 from stackoverflow_to_sqlite.sqlite_helpers import (
     ensure_fts,
     upsert_answers,
+    upsert_comments,
     upsert_questions,
 )
-from stackoverflow_to_sqlite.stack_exchange_api import fetch_answers, fetch_questions
+from stackoverflow_to_sqlite.stack_exchange_api import (
+    fetch_answers,
+    fetch_comments,
+    fetch_questions,
+)
 
 DEFAULT_DB_NAME = "stack-exchange.db"
 DB_PATH_HELP = "A path to a SQLite database file. If it doesn't exist, it will be created. While it can have any extension, `.db` or `.sqlite` is recommended."
@@ -48,8 +53,14 @@ def user(db_path: str, user_id: str):
     upsert_answers(db, answers)
     click.echo("  done!")
 
+    click.echo("\nfetching comments", nl=False)
+    comments = fetch_comments(user_id, "stackoverflow.com")
+    click.echo("  writing comments")
+    upsert_comments(db, comments)
+    click.echo("  done!")
+
     ensure_fts(db)
-    print("Wrote to db!")
+    print("\nWrote to db!")
     # print(questions)
     # save_comments(db, comments)
     # click.echo(f"saved/updated {len(comments)} comments")
