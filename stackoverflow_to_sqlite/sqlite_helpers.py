@@ -30,8 +30,10 @@ def upsert_questions(db: Database, questions: list[QuestionResponse]):
 
     db["users"].insert(
         {
-            "account_id": questions[0]["owner"]["account_id"],
+            "account_id": (aid := questions[0]["owner"]["account_id"]),
+            # just `name` because it shows up nicer in datasette that way
             "name": questions[0]["owner"]["display_name"],
+            "network_profile_url": f"https://stackexchange.com/users/{aid}/",
         },
         pk="account_id",
     )

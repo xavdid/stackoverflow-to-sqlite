@@ -20,7 +20,13 @@ def test_full_backup(questions_response, tmp_db_path, tmp_db: Database):
         tmp_db.table_names()
     )
 
-    assert list(tmp_db["users"].rows) == [{"account_id": 2045145, "name": "xavdid"}]
+    assert list(tmp_db["users"].rows) == [
+        {
+            "account_id": 2045145,
+            "name": "xavdid",
+            "network_profile_url": "https://stackexchange.com/users/2045145/",
+        }
+    ]
     assert list(tmp_db["questions"].rows) == [
         {
             "answer_count": 0,
