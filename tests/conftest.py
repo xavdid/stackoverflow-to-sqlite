@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 import pytest
 from sqlite_utils import Database
 
-from stackoverflow_to_sqlite.stack_exchange_api import QUESTION_FILTER
+from stackoverflow_to_sqlite.stack_exchange_api import RESPONSE_FILTER
 
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def questions_response(httpx_mock):
     params = {
         "pagesize": 100,
         "site": "stackoverflow.com",
-        "filter": QUESTION_FILTER,
+        "filter": RESPONSE_FILTER,
         "order": "desc",
         "sort": "creation",
         "page": 1,
@@ -44,20 +44,7 @@ def questions_response(httpx_mock):
             "items": [
                 {
                     "tags": ["macros", "elixir"],
-                    "comments": [
-                        {
-                            "owner": {
-                                "account_id": 10360,
-                                "reputation": 5788,
-                                "user_id": 19520,
-                                "user_type": "registered",
-                                "display_name": "ema",
-                                "link": "https://stackoverflow.com/users/19520/ema",
-                            },
-                            "post_id": 77357478,
-                            "comment_id": 136380173,
-                        }
-                    ],
+                    "comment_count": 1,
                     "owner": {
                         "account_id": 2045145,
                         "reputation": 5204,
@@ -83,56 +70,7 @@ def questions_response(httpx_mock):
                 },
                 {
                     "tags": ["javascript", "jquery", "iframe", "xss"],
-                    "comments": [
-                        {
-                            "owner": {
-                                "account_id": 1244536,
-                                "reputation": 50506,
-                                "user_id": 1206267,
-                                "user_type": "registered",
-                                "display_name": "Ohgodwhy",
-                                "link": "https://stackoverflow.com/users/1206267/ohgodwhy",
-                            },
-                            "post_id": 19287918,
-                            "comment_id": 28560850,
-                        },
-                        {
-                            "owner": {
-                                "account_id": 2045145,
-                                "reputation": 5204,
-                                "user_id": 1825390,
-                                "user_type": "registered",
-                                "display_name": "xavdid",
-                                "link": "https://stackoverflow.com/users/1825390/xavdid",
-                            },
-                            "post_id": 19287918,
-                            "comment_id": 28560912,
-                        },
-                        {
-                            "owner": {
-                                "account_id": 1244536,
-                                "reputation": 50506,
-                                "user_id": 1206267,
-                                "user_type": "registered",
-                                "display_name": "Ohgodwhy",
-                                "link": "https://stackoverflow.com/users/1206267/ohgodwhy",
-                            },
-                            "post_id": 19287918,
-                            "comment_id": 28560933,
-                        },
-                        {
-                            "owner": {
-                                "account_id": 2045145,
-                                "reputation": 5204,
-                                "user_id": 1825390,
-                                "user_type": "registered",
-                                "display_name": "xavdid",
-                                "link": "https://stackoverflow.com/users/1825390/xavdid",
-                            },
-                            "post_id": 19287918,
-                            "comment_id": 28561006,
-                        },
-                    ],
+                    "comment_count": 4,
                     "owner": {
                         "account_id": 2045145,
                         "reputation": 5204,
@@ -156,6 +94,75 @@ def questions_response(httpx_mock):
                     "closed_reason": "Duplicate",
                     "title": "Implementing an XSS attack",
                     "link": "https://stackoverflow.com/questions/19287918/implementing-an-xss-attack",
+                },
+            ],
+        },
+    }
+
+    httpx_mock.add_response(**mock_details)
+
+
+@pytest.fixture
+def answers_response(httpx_mock):
+    params = {
+        "pagesize": 100,
+        "site": "stackoverflow.com",
+        "filter": RESPONSE_FILTER,
+        "order": "desc",
+        "sort": "creation",
+        "page": 1,
+    }
+
+    mock_details = {
+        "url": f"https://api.stackexchange.com/2.3/users/123/answers?{urlencode(params)}",
+        "json": {
+            "has_more": False,
+            "page": 1,
+            "page_size": 100,
+            "total": 15,
+            "type": "questions",
+            "items": [
+                {
+                    "tags": [],
+                    "owner": {
+                        "account_id": 2045145,
+                        "reputation": 5204,
+                        "user_id": 1825390,
+                        "user_type": "registered",
+                        "display_name": "xavdid",
+                        "link": "https://stackoverflow.com/users/1825390/xavdid",
+                    },
+                    "comment_count": 4,
+                    "down_vote_count": 0,
+                    "up_vote_count": 0,
+                    "is_accepted": True,
+                    "score": 0,
+                    "creation_date": 1643673277,
+                    "answer_id": 70934214,
+                    "body_markdown": "This is possible!",
+                    "link": "https://stackoverflow.com/questions/70901751/find-replace-data-in-a-csv-using-python-on-zapier/70934214#70934214",
+                    "title": "Find &amp; replace data in a CSV using Python on Zapier",
+                },
+                {
+                    "tags": [],
+                    "owner": {
+                        "account_id": 2045145,
+                        "reputation": 5204,
+                        "user_id": 1825390,
+                        "user_type": "registered",
+                        "display_name": "xavdid",
+                        "link": "https://stackoverflow.com/users/1825390/xavdid",
+                    },
+                    "comment_count": 2,
+                    "down_vote_count": 0,
+                    "up_vote_count": 0,
+                    "is_accepted": False,
+                    "score": 0,
+                    "creation_date": 1643666093,
+                    "last_edit_date": 1643666193,
+                    "body_markdown": "In javascript, variables",
+                    "link": "https://stackoverflow.com/questions/70598105/zapier-javascript-find-replace-special-characters/70933266#70933266",
+                    "title": "Zapier Javascript Find/Replace Special Characters",
                 },
             ],
         },

@@ -12,13 +12,21 @@ def test_version():
         assert result.output.startswith("cli, version ")
 
 
-def test_full_backup(questions_response, tmp_db_path, tmp_db: Database):
+def test_full_backup(
+    questions_response, answers_response, tmp_db_path, tmp_db: Database
+):
     result = CliRunner().invoke(cli, ["user", "123", "--db", tmp_db_path])
     assert result.exit_code == 0
 
-    assert {"users", "tags", "questions", "questions_fts", "questions_tags"} <= set(
-        tmp_db.table_names()
-    )
+    assert {
+        "users",
+        "tags",
+        "questions",
+        "questions_fts",
+        "questions_tags",
+        "answers",
+        "answers_fts",
+    } <= set(tmp_db.table_names())
 
     assert list(tmp_db["users"].rows) == [
         {
@@ -30,7 +38,7 @@ def test_full_backup(questions_response, tmp_db_path, tmp_db: Database):
     assert list(tmp_db["questions"].rows) == [
         {
             "answer_count": 0,
-            "asker": 2045145,
+            "user": 2045145,
             "body_markdown": "a questiona about security and things",
             "closed_date": 1448182440,
             "closed_reason": "Duplicate",
@@ -51,7 +59,7 @@ def test_full_backup(questions_response, tmp_db_path, tmp_db: Database):
         },
         {
             "answer_count": 1,
-            "asker": 2045145,
+            "user": 2045145,
             "body_markdown": "a very cool elixir question and stuff",
             "closed_date": None,
             "closed_reason": None,
@@ -72,10 +80,44 @@ def test_full_backup(questions_response, tmp_db_path, tmp_db: Database):
         },
     ]
 
+    assert list(tmp_db["answers"].rows) == [
+        {
+            "answer_id": 70934214,
+            "body_markdown": "This is possible!",
+            "comment_count": 4,
+            "creation_date": 1643673277,
+            "down_vote_count": 0,
+            "is_accepted": 1,
+            "last_edit_date": None,
+            "link": "https://stackoverflow.com/questions/70901751/find-replace-data-in-a-csv-using-python-on-zapier/70934214#70934214",
+            "question_title": "Find &amp; replace data in a CSV using Python on Zapier",
+            "score": 0,
+            "site": "stackoverflow.com",
+            "up_vote_count": 0,
+            "user": 2045145,
+        },
+        {
+            "answer_id": 70934215,
+            "body_markdown": "In javascript, variables",
+            "comment_count": 2,
+            "creation_date": 1643666093,
+            "down_vote_count": 0,
+            "is_accepted": 0,
+            "last_edit_date": 1643666193,
+            "link": "https://stackoverflow.com/questions/70598105/zapier-javascript-find-replace-special-characters/70933266#70933266",
+            "question_title": "Zapier Javascript Find/Replace Special Characters",
+            "score": 0,
+            "site": "stackoverflow.com",
+            "up_vote_count": 0,
+            "user": 2045145,
+        },
+    ]
+
     # validate that the FK was set up correctly
     assert (
-        "[asker] INTEGER REFERENCES [users]([account_id])" in tmp_db["questions"].schema
+        "[user] INTEGER REFERENCES [users]([account_id])" in tmp_db["questions"].schema
     )
+    assert "[user] INTEGER REFERENCES [users]([account_id])" in tmp_db["answers"].schema
 
     assert list(tmp_db["tags"].rows) == [
         {
@@ -124,3 +166,6 @@ def test_full_backup(questions_response, tmp_db_path, tmp_db: Database):
             "tags_id": "xss",
         },
     ]
+
+
+# TODO: live test to make sure my filter is still working as expected

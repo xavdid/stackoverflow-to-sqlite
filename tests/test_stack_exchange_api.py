@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 import pytest
 
-from stackoverflow_to_sqlite.stack_exchange_api import QUESTION_FILTER, fetch_questions
+from stackoverflow_to_sqlite.stack_exchange_api import RESPONSE_FILTER, fetch_questions
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def build_paging_mock(httpx_mock):
             params = {
                 "pagesize": 100,
                 "site": "stackoverflow.com",
-                "filter": QUESTION_FILTER,
+                "filter": RESPONSE_FILTER,
                 "order": "desc",
                 "sort": "creation",
                 "page": page,

@@ -23,7 +23,7 @@ class User(TypedDict):
 
 class QuestionResponse(TypedDict):
     tags: list[str]
-    comments: NotRequired[list[Any]]
+    comment_count: int
     owner: User
     is_answered: bool
     view_count: int
@@ -47,12 +47,38 @@ class QuestionRow(QuestionResponse):
     # these get dumped out as a stringified list, which isn't great
     # but neither is support for m2m relationships: https://github.com/simonw/datasette/issues/484
     tags: None
-    comments: None
-    comment_count: int
     has_accepted_answer: bool
     accepted_answer_id: None
     is_considered_answered: bool
     is_answered: None
     owner: None
     site: str
-    asker: int  # account_id
+    user: int  # account_id
+
+
+class AnswerResponse(TypedDict):
+    down_vote_count: int
+    up_vote_count: int
+    is_accepted: bool
+    comment_count: int
+    score: int
+    last_edit_date: NotRequired[int]
+    creation_date: int
+    answer_id: int
+    body_markdown: str
+    link: str
+    owner: User
+    title: str
+    # shows up, but is always empty
+    # see: https://stackapps.com/questions/7213/the-answer-object-returns-an-empty-array-for-tags
+    # I could do a second request for only the answer tags, but that's annoying
+    tags: list[str]
+
+
+class AnswerRow(AnswerResponse):
+    owner: None
+    site: str
+    user: int  # account_id
+    title: None
+    question_title: str
+    tags: None

@@ -1,12 +1,16 @@
 from itertools import count
-from typing import Optional
+from typing import Literal, Optional
 
 import httpx
 
-from stackoverflow_to_sqlite.types import QuestionResponse, ResponseWrapper
+from stackoverflow_to_sqlite.types import (
+    AnswerResponse,
+    QuestionResponse,
+    ResponseWrapper,
+)
 
-# https://api.stackexchange.com/2.3/users/474013/questions?pagesize=100&order=desc&sort=activity&site=math.stackexchange.com&filter=!OSaAEBD*BtuYwi(Zar.e4TBVOLdsyLhbieqkN9D*eGA
-QUESTION_FILTER = "!OSaAEBD*BtuYwi(Zar.e4TBVOLdsyLhbieqkN9D*eGA"
+# this works for responses of all types
+RESPONSE_FILTER = "!S)wxxkXA5fyMMShzhUnJpTEaqB4NZq8VWklMWjBAqPt.BT6LDY0bt5*yNvTlYS7E"
 
 
 def _api_call(
@@ -23,18 +27,31 @@ def _api_call(
     return response.json()
 
 
-def fetch_questions(user_id: str, site: str) -> list[QuestionResponse]:
-    result: list[QuestionResponse] = []
+def _fetch_paged_resource(
+    resource: Literal["questions", "answers", "comments"], user_id: str, site: str
+) -> list:
+    result = []
     for page in count(1):
         response = _api_call(
-            f"/users/{user_id}/questions",
+            f"/users/{user_id}/{resource}",
             site,
-            filter_=QUESTION_FILTER,
+            filter_=RESPONSE_FILTER,
             params={"order": "desc", "sort": "creation", "page": page},
         )
+        print(".", end="", flush=True)
+
+        # TODO: handle error and save what we got
 
         result += response["items"]
         if not response["has_more"]:
             break
 
     return result
+
+
+def fetch_questions(user_id: str, site: str) -> list[QuestionResponse]:
+    return _fetch_paged_resource("questions", user_id, site)
+
+
+def fetch_answers(user_id: str, site: str) -> list[AnswerResponse]:
+    return _fetch_paged_resource("answers", user_id, site)
