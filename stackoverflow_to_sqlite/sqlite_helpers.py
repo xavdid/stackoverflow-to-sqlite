@@ -1,12 +1,16 @@
+from typing import cast
 from urllib.parse import urlparse
 
 from sqlite_utils import Database
 
 from stackoverflow_to_sqlite.types import (
+    AnswerBase,
     AnswerResponse,
     AnswerRow,
+    CommentBase,
     CommentResopnse,
     CommentRow,
+    QuestionBase,
     QuestionResponse,
     QuestionRow,
     User,
@@ -30,13 +34,18 @@ def user_to_row(user: User) -> UserRow:
 
 def question_to_row(question: QuestionResponse) -> QuestionRow:
     return {
-        **question,
-        "tags": None,  # str(question["tags"]).strip("[]"),
-        "owner": None,
+        **cast(
+            QuestionBase,
+            {
+                k: v
+                for k, v in question.items()
+                # keys of a QuestionResponse
+                if k not in ("tags", "owner", "is_answered", "accepted_answer_id")
+            },
+        ),
         "user": question["owner"]["account_id"],
-        "accepted_answer_id": None,
+        # "accepted_answer_id": None,
         "has_accepted_answer": bool(question.get("accepted_answer_id")),
-        "is_answered": None,
         "is_considered_answered": question["is_answered"],
         "site": urlparse(question["link"]).hostname or "UNKNOWN",
     }
@@ -44,34 +53,44 @@ def question_to_row(question: QuestionResponse) -> QuestionRow:
 
 def answer_to_row(answer: AnswerResponse) -> AnswerRow:
     return {
-        **answer,
-        "owner": None,
+        **cast(
+            AnswerBase,
+            {
+                k: v
+                for k, v in answer.items()
+                # keys of a AnswerResponse
+                if k not in ("tags", "owner", "title")
+            },
+        ),
         "user": answer["owner"]["account_id"],
         "site": urlparse(answer["link"]).hostname or "UNKNOWN",
-        "title": None,
         "question_title": answer["title"],
-        "tags": None,
     }
 
 
 def comment_to_row(comment: CommentResopnse) -> CommentRow:
     return {
-        **comment,
-        "owner": None,
+        **cast(
+            CommentBase,
+            {
+                k: v
+                for k, v in comment.items()
+                # keys of a CommentResponse
+                if k not in ("owner", "body")
+            },
+        ),
         "user": comment["owner"]["account_id"],
-        "body": None,
         "site": urlparse(comment["link"]).hostname or "UNKNOWN",
     }
-
-
-def remove_none(d: dict) -> dict:
-    return {k: v for k, v in d.items() if v is not None}
 
 
 def upsert_user(db: Database, user: User):
     # I want to insert(ignore=True) here, but
     # https://github.com/simonw/sqlite-utils/issues/554
-    db["users"].upsert(user_to_row(user), pk="account_id")
+    db["users"].upsert(  # type: ignore
+        user_to_row(user),
+        pk="account_id",  # type: ignore
+    )
 
 
 def upsert_questions(db: Database, questions: list[QuestionResponse]):
@@ -81,11 +100,11 @@ def upsert_questions(db: Database, questions: list[QuestionResponse]):
         upsert_user(db, questions[0]["owner"])
 
     for q in questions:
-        db["questions"].insert(
-            remove_none(question_to_row(q)),
-            pk="question_id",
+        db["questions"].insert(  # type: ignore
+            question_to_row(q),  # type: ignore
+            pk="question_id",  # type: ignore
             alter=True,
-            foreign_keys=[("user", "users", "account_id")],
+            foreign_keys=[("user", "users", "account_id")],  # type: ignore
             column_order=[
                 "question_id",
                 "link",
@@ -108,11 +127,11 @@ def upsert_answers(db: Database, answers: list[AnswerResponse]):
         upsert_user(db, answers[0]["owner"])
 
     for a in answers:
-        db["answers"].insert(
-            remove_none(answer_to_row(a)),
-            pk="answer_id",
+        db["answers"].insert(  # type: ignore
+            answer_to_row(a),  # type: ignore
+            pk="answer_id",  # type: ignore
             alter=True,
-            foreign_keys=[("user", "users", "account_id")],
+            foreign_keys=[("user", "users", "account_id")],  # type: ignore
             column_order=[
                 "answer_id",
                 "link",
@@ -130,11 +149,11 @@ def upsert_comments(db: Database, comments: list[CommentResopnse]):
         upsert_user(db, comments[0]["owner"])
 
     for c in comments:
-        db["comments"].insert(
-            remove_none(comment_to_row(c)),
-            pk="comment_id",
+        db["comments"].insert(  # type: ignore
+            comment_to_row(c),  # type: ignore
+            pk="comment_id",  # type: ignore
             alter=True,
-            foreign_keys=[("user", "users", "account_id")],
+            foreign_keys=[("user", "users", "account_id")],  # type: ignore
             column_order=[
                 "comment_id",
                 "link",

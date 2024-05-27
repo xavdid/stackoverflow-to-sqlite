@@ -2,6 +2,10 @@ from typing import NotRequired, TypedDict
 
 
 class ResponseWrapper[T](TypedDict):
+    """
+    Individual API items live in `items` and the whole thing is wrapped in this
+    """
+
     has_more: bool
     quota_max: int
     quota_remaining: int
@@ -28,16 +32,24 @@ class UserRow(TypedDict):
     network_profile_url: str
 
 
-class QuestionResponse(TypedDict):
-    tags: list[str]
+"""
+Each of question / answer / comment have 3 classes:
+
+- the base, which has common fields for the other two
+- the response, which has raw API data
+- the row, which is what gets puts into sqlite
+
+There's a `X_to_row` function for each to translate from Response to Row,
+renaming and tweaking keys to match the output type
+"""
+
+
+class QuestionBase(TypedDict):
     comment_count: int
-    owner: User
-    is_answered: bool
     view_count: int
     favorite_count: int
     down_vote_count: int
     up_vote_count: int
-    accepted_answer_id: NotRequired[int]
     answer_count: int
     score: int
     last_activity_date: int
@@ -50,20 +62,23 @@ class QuestionResponse(TypedDict):
     closed_reason: NotRequired[str]
 
 
-class QuestionRow(QuestionResponse):
+class QuestionResponse(QuestionBase):
     # these get dumped out as a stringified list, which isn't great
     # but neither is support for m2m relationships: https://github.com/simonw/datasette/issues/484
-    tags: None
+    tags: list[str]
+    owner: User
+    is_answered: bool
+    accepted_answer_id: NotRequired[int]
+
+
+class QuestionRow(QuestionBase):
     has_accepted_answer: bool
-    accepted_answer_id: None
     is_considered_answered: bool
-    is_answered: None
-    owner: None
     user: int  # account_id
     site: str
 
 
-class AnswerResponse(TypedDict):
+class AnswerBase(TypedDict):
     down_vote_count: int
     up_vote_count: int
     is_accepted: bool
@@ -74,6 +89,9 @@ class AnswerResponse(TypedDict):
     answer_id: int
     body_markdown: str
     link: str
+
+
+class AnswerResponse(AnswerBase):
     owner: User
     title: str
     # shows up, but is always empty
@@ -82,28 +100,26 @@ class AnswerResponse(TypedDict):
     tags: list[str]
 
 
-class AnswerRow(AnswerResponse):
-    owner: None
+class AnswerRow(AnswerBase):
     user: int  # account_id
     site: str
-    title: None
     question_title: str
-    tags: None
 
 
-class CommentResopnse(TypedDict):
+class CommentBase(TypedDict):
     score: int
     post_type: str
     body_markdown: str
     post_id: int
     comment_id: int
     link: str
+
+
+class CommentResopnse(CommentBase):
     owner: User
     body: str
 
 
-class CommentRow(CommentResopnse):
-    owner: None
+class CommentRow(CommentBase):
     user: int  # account_id
-    body: None
     site: str
