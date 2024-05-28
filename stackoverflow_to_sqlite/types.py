@@ -1,4 +1,5 @@
-from typing import NotRequired, TypedDict
+from typing import NotRequired, TypedDict, cast
+from urllib.parse import urlparse
 
 
 class ResponseWrapper[T](TypedDict):
@@ -123,3 +124,60 @@ class CommentResopnse(CommentBase):
 class CommentRow(CommentBase):
     user: int  # account_id
     site: str
+
+
+def _get_domain(url: str) -> str:
+    return urlparse(url).hostname or "UNKNOWN"
+
+
+def _remove_keys(
+    d: QuestionResponse | AnswerResponse | CommentResopnse, keys: tuple[str, ...]
+) -> dict[str, object]:
+    return {k: v for k, v in d.items() if k not in keys}
+
+
+def user_to_row(user: User) -> UserRow:
+    return {
+        "account_id": (aid := user["account_id"]),
+        # just `name` because it shows up nicer in datasette that way
+        "name": user["display_name"],
+        "network_profile_url": f"https://stackexchange.com/users/{aid}/",
+        # only record user id if we're sourcing from SO
+        # it's probably useful for this to exist
+        "stack_overflow_id": user["user_id"]
+        if "https://stackoverflow.com" in user["link"]
+        else None,
+    }
+
+
+def question_to_row(question: QuestionResponse) -> QuestionRow:
+    return {
+        **cast(
+            QuestionBase,
+            _remove_keys(
+                question, ("tags", "owner", "is_answered", "accepted_answer_id")
+            ),
+        ),
+        "user": question["owner"]["account_id"],
+        # "accepted_answer_id": None,
+        "has_accepted_answer": bool(question.get("accepted_answer_id")),
+        "is_considered_answered": question["is_answered"],
+        "site": _get_domain(question["link"]),
+    }
+
+
+def answer_to_row(answer: AnswerResponse) -> AnswerRow:
+    return {
+        **cast(AnswerBase, _remove_keys(answer, ("tags", "owner", "title"))),
+        "user": answer["owner"]["account_id"],
+        "site": _get_domain(answer["link"]),
+        "question_title": answer["title"],
+    }
+
+
+def comment_to_row(comment: CommentResopnse) -> CommentRow:
+    return {
+        **cast(CommentBase, _remove_keys(comment, ("owner", "body"))),
+        "user": comment["owner"]["account_id"],
+        "site": _get_domain(comment["link"]),
+    }

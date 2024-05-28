@@ -29,6 +29,8 @@ def test_full_backup(
         "questions_tags",
         "answers",
         "answers_fts",
+        "comments",
+        "comments_fts",
     } <= set(tmp_db.table_names())
 
     assert list(tmp_db["users"].rows) == [

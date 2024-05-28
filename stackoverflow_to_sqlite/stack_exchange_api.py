@@ -11,6 +11,7 @@ from stackoverflow_to_sqlite.types import (
 )
 
 # this works for responses of all types
+# to add return values, paste this into the filter edit box, then make changes and re-copy the results
 # NOTE: includes comment.body in addition to comment.body_markdown because the latter doesn't reliably show up if the former is missing??
 RESPONSE_FILTER = (
     "!FHoa8)KWO*ZQJclfFQ-ArYmMMP7me1YZuhJpcQSM(ORmcE)-)3oYySMQ.8K2CnuTRz0h0MPb"
