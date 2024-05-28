@@ -45,3 +45,8 @@ build-backend = "flit_core.buildapi"
 select = ["E", "F", "I001"] # defaults & isort
 ignore = ["E501"]
 unfixable = ["F401"]
+
+[tool.pytest.ini_options]
+markers = [
+  "live: marks test that hit live data as slow (deselect with '--include-live')",
+]

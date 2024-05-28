@@ -15,6 +15,10 @@ _require-venv:
 @test *options:
     pytest {{options}}
 
+# only run live tests
+@test-live:
+    pytest -m live --include-live
+
 @lint:
     ruff check . --quiet
     ruff format --check --quiet

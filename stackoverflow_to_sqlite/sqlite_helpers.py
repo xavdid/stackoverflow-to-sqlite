@@ -1,4 +1,4 @@
-from typing import Callable, Literal, Optional, TypeVar
+from typing import Callable, Literal, TypeVar
 
 from sqlite_utils import Database
 
@@ -46,12 +46,13 @@ def _upsert_objects(
     for o in objects:
         to_save = transformer(o)
 
-        t = db[f"{object_name}s"].insert(  # type: ignore
+        # don't really want to upsert
+        t = db[f"{object_name}s"].upsert(  # type: ignore
             to_save,  # type:ignore
             pk=f"{object_name}_id",  # type: ignore
-            alter=True,
+            alter=True,  # type:ignore
             foreign_keys=[("user", "users", "account_id")],  # type: ignore
-            column_order=column_order,
+            column_order=column_order,  # type:ignore
         )
         if include_tags and "tags" in o:
             t.m2m("tags", [{"name": t} for t in o["tags"]], pk="name")

@@ -45,32 +45,25 @@ def user(db_path: str, user_id: str):
     questions = fetch_questions(user_id, "stackoverflow.com")
     click.echo("  writing questions")
     upsert_questions(db, questions)
-    click.echo("  done!")
+    click.echo(f"  done! Archived {len(questions)} questions")
 
     click.echo("\nfetching answers", nl=False)
     answers = fetch_answers(user_id, "stackoverflow.com")
     click.echo("  writing answers")
     upsert_answers(db, answers)
-    click.echo("  done!")
+    click.echo(f"  done! Archived {len(answers)} answers")
 
     click.echo("\nfetching comments", nl=False)
     comments = fetch_comments(user_id, "stackoverflow.com")
     click.echo("  writing comments")
     upsert_comments(db, comments)
-    click.echo("  done!")
+    click.echo(f"  done! Archived {len(comments)} comments")
+
+    if not (questions or answers or comments):
+        raise click.ClickException(
+            f"no data found for StackOverflow user_id: {user_id}"
+        )
 
     ensure_fts(db)
-    print("\nWrote to db!")
-    # print(questions)
-    # save_comments(db, comments)
-    # click.echo(f"saved/updated {len(comments)} comments")
 
-    # click.echo("\nfetching (up to 10 pages of) posts")
-    # posts = load_posts_for_user(username)
-    # save_posts(db, posts)
-    # click.echo(f"saved/updated {len(posts)} posts")
-
-    # if not (comments or posts):
-    #     raise click.ClickException(f"no data found for username: {username}")
-
-    # ensure_fts(db)
+    click.echo("\nDone!")

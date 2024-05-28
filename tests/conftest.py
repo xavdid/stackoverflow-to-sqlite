@@ -6,6 +6,22 @@ from sqlite_utils import Database
 from stackoverflow_to_sqlite.stack_exchange_api import RESPONSE_FILTER
 
 
+def pytest_addoption(parser: pytest.Parser):
+    parser.addoption(
+        "--include-live", action="store_true", default=False, help="run live-data tests"
+    )
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]):
+    if config.getoption("--include-live"):
+        return
+
+    skip_live = pytest.mark.skip(reason="need --include-live option to run")
+    for item in items:
+        if "live" in item.keywords:
+            item.add_marker(skip_live)
+
+
 @pytest.fixture
 def tmp_db_path(tmp_path):
     """
@@ -20,6 +36,32 @@ def tmp_db(tmp_db_path):
     returns a Database in a temp dir
     """
     return Database(tmp_db_path)
+
+
+@pytest.fixture
+def empty_responses(httpx_mock):
+    params = {
+        "pagesize": 100,
+        "site": "stackoverflow.com",
+        "filter": RESPONSE_FILTER,
+        "order": "desc",
+        "sort": "creation",
+        "page": 1,
+    }
+
+    for resource in ["questions", "answers", "comments"]:
+        mock_details = {
+            "url": f"https://api.stackexchange.com/2.3/users/123/{resource}?{urlencode(params)}",
+            "json": {
+                "has_more": False,
+                "page": 1,
+                "page_size": 100,
+                "total": 15,
+                "type": "questions",
+                "items": [],
+            },
+        }
+        httpx_mock.add_response(**mock_details)
 
 
 @pytest.fixture
@@ -120,7 +162,7 @@ def answers_response(httpx_mock):
             "page": 1,
             "page_size": 100,
             "total": 15,
-            "type": "questions",
+            "type": "answers",
             "items": [
                 {
                     "tags": [],
@@ -159,6 +201,7 @@ def answers_response(httpx_mock):
                     "is_accepted": False,
                     "score": 0,
                     "creation_date": 1643666093,
+                    "answer_id": 70933266,
                     "last_edit_date": 1643666193,
                     "body_markdown": "In javascript, variables",
                     "link": "https://stackoverflow.com/questions/70598105/zapier-javascript-find-replace-special-characters/70933266#70933266",
@@ -189,7 +232,7 @@ def comments_response(httpx_mock):
             "page": 1,
             "page_size": 100,
             "total": 15,
-            "type": "questions",
+            "type": "comments",
             "items": [
                 {
                     "owner": {
