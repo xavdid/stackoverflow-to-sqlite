@@ -3,15 +3,15 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from stackoverflow_to_sqlite.cli import cli
+from stackoverflow_to_sqlite.cli import save_user
 
 
 def test_version():
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cli, ["--version"])
+        result = runner.invoke(save_user, ["--version"])
         assert 0 == result.exit_code
-        assert result.output.startswith("cli, version ")
+        assert result.output.startswith("save-user, version ")
 
 
 def test_full_backup(
@@ -21,7 +21,7 @@ def test_full_backup(
     tmp_db_path,
     tmp_db,
 ):
-    result = CliRunner().invoke(cli, ["user", "123", "--db", tmp_db_path])
+    result = CliRunner().invoke(save_user, ["123", "--db", tmp_db_path])
     assert result.exit_code == 0
 
     assert {
@@ -203,9 +203,7 @@ def test_full_backup(
 
 
 def test_no_data(tmp_db_path, empty_responses):
-    result = CliRunner(mix_stderr=False).invoke(
-        cli, ["user", "123", "--db", tmp_db_path]
-    )
+    result = CliRunner(mix_stderr=False).invoke(save_user, ["123", "--db", tmp_db_path])
     assert result.exit_code == 1
     assert "Error: no data found for StackOverflow user_id: 123" in result.stderr
 
@@ -213,7 +211,7 @@ def test_no_data(tmp_db_path, empty_responses):
 def test_rerun(tmp_db_path, questions_response, answers_response, comments_response):
     # should be able to re-run on the same db and not error
     for _ in range(2):
-        result = CliRunner().invoke(cli, ["user", "123", "--db", tmp_db_path])
+        result = CliRunner().invoke(save_user, ["123", "--db", tmp_db_path])
         assert result.exit_code == 0
 
 
@@ -223,7 +221,7 @@ def test_rerun(tmp_db_path, questions_response, answers_response, comments_respo
 )
 @pytest.mark.live
 def test_live_data(tmp_db_path, tmp_db):
-    result = CliRunner().invoke(cli, ["user", "1825390", "--db", tmp_db_path])
+    result = CliRunner().invoke(save_user, ["1825390", "--db", tmp_db_path])
     assert result.exit_code == 0
 
     # at time of writing I've only asked 15 questions

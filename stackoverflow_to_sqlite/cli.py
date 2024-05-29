@@ -17,13 +17,8 @@ DEFAULT_DB_NAME = "stack-exchange.db"
 DB_PATH_HELP = "A path to a SQLite database file. If it doesn't exist, it will be created. While it can have any extension, `.db` or `.sqlite` is recommended."
 
 
-@click.group()
+@click.command()
 @click.version_option()
-def cli():
-    "Save all the contributions for a StackOverflow user to a SQLite database. Optionally include their authored content from across the StackExchange network"
-
-
-@cli.command()
 @click.argument("user_id")
 @click.option(
     "--db",
@@ -35,8 +30,11 @@ def cli():
 # TODO: no network / include network?
 # TODO: custom filter? will have to ingest nicely
 # TODO: full refresh? don't bail early (by default I'm going to stop fetching pages once I see an item created more than N days ago)
-def user(db_path: str, user_id: str):
-    # username = clean_username(username)
+def save_user(db_path: str, user_id: str):
+    """
+    Save all the contributions for a StackOverflow user to a SQLite database.
+    """
+    #  Optionally include their authored content from across the StackExchange network
     click.echo(f"loading data about StackOverflow user_id: {user_id} into {db_path}")
 
     db = Database(db_path)
