@@ -1,6 +1,6 @@
 [project]
 name = "stackoverflow-to-sqlite"
-version = "0.1.0"
+version = "0.1.1"
 
 authors = [{ name = "David Brownman", email = "beamneocube@gmail.com" }]
 description = "Quickly and painlessly dump all your Airtable schemas & data to JSON."
