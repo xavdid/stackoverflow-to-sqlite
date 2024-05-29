@@ -1,6 +1,3 @@
-# from sqlite_utils import Database
-
-
 from urllib.parse import urlencode
 
 import pytest
