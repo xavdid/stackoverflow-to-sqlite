@@ -47,6 +47,4 @@ ignore = ["E501"]
 unfixable = ["F401"]
 
 [tool.pytest.ini_options]
-markers = [
-  "live: marks test that hit live data as slow (deselect with '--include-live')",
-]
+markers = ["live: tests which hit live data (run with '--include-live')"]

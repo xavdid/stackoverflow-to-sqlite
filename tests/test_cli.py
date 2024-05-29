@@ -126,6 +126,7 @@ def test_full_backup(
         {
             "body_markdown": "While true, I can&#39;t think of a",
             "comment_id": 132839139,
+            "creation_date": 1675060046,
             "link": "https://stackoverflow.com/questions/3854310/how-to-convert-a-negative-number-to-positive/53985308#comment132839139_53985308",
             "post_id": 53985308,
             "post_type": "answer",
@@ -136,6 +137,7 @@ def test_full_backup(
         {
             "body_markdown": "Awesome, thank you for the explanation!",
             "comment_id": 136383710,
+            "creation_date": 1698257828,
             "link": "https://stackoverflow.com/questions/77357478/is-it-possible-to-define-case-clauses-with-an-elixir-macro/77359032#comment136383710_77359032",
             "post_id": 77359032,
             "post_type": "answer",

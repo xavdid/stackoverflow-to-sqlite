@@ -13,7 +13,7 @@ from stackoverflow_to_sqlite.stack_exchange_api import (
     fetch_questions,
 )
 
-DEFAULT_DB_NAME = "stack-exchange.db"
+DEFAULT_DB_NAME = "stackoverflow.db"
 DB_PATH_HELP = "A path to a SQLite database file. If it doesn't exist, it will be created. While it can have any extension, `.db` or `.sqlite` is recommended."
 
 

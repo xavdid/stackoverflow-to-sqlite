@@ -114,6 +114,7 @@ class CommentBase(TypedDict):
     post_id: int
     comment_id: int
     link: str
+    creation_date: int
 
 
 class CommentResopnse(CommentBase):
