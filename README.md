@@ -116,7 +116,9 @@ You'll get a nice, formatted output!
 
 ## Motivation
 
-I got nervous when I saw Reddit's [notification of upcoming API changes](https://old.reddit.com/r/reddit/comments/12qwagm/an_update_regarding_reddits_api/). To ensure I could always access data I created, I wanted to make sure I had a backup in place before anything changed in a big way.
+StackOverflow has [recently announced](https://stackoverflow.blog/2023/07/27/announcing-overflowai/) some pretty major AI-related plans. They also don't allow you to [modify or remove your content in protest](https://m.benui.ca/@ben/112396505994216742). There's no real guarantee around what they will or won't do to content you've produced.
+
+Ultimately, there's no better steward of data you've put time and energy into creating than you. This builds a searchable archive of everything you've ever said on StackOverflow, which is nice in case it gets different or worse.
 
 ## FAQs
 
@@ -129,7 +131,7 @@ At some point, I'd like to crawl the entire Stack Exchange network. An account i
 Datasette truncates long text fields by default. You can disable this behavior by using the `truncate_cells_html` flag when running `datasette` ([see the docs](https://docs.datasette.io/en/stable/settings.html#truncate-cells-html)):
 
 ```shell
-datasette reddit.db --setting truncate_cells_html 0
+datasette stackoverflow.db --setting truncate_cells_html 0
 ```
 
 ### Does this tool refetch old data?
@@ -137,6 +139,10 @@ datasette reddit.db --setting truncate_cells_html 0
 Yes, currently it does a full backup every time the command is run. It technically does upserts on every row, so it'll update existing rows with new data.
 
 I'd like to stop saving items once we've seen an item we've saved already, but doing it that way hasn't been a priority.
+
+### Why doesn't this capture questions along with answers?
+
+Because the goal is to capture your own data, not archive all of SO. There's [better avenues for that](https://archive.org/details/stackexchange).
 
 ## Development
 
